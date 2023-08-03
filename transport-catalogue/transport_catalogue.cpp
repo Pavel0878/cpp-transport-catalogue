@@ -4,8 +4,6 @@
 
 using namespace std;
 
-
-
 	void TransportCatalogue::AddStop(string_view name, double latitude, double longitude) {
 	//	if(latitude < -90.0 && 90.0 < latitude) { throw invalid_argument("широта не верна"s); }
 	//	if (longitude < -180.0 && 180.0 < longitude) { throw invalid_argument("долгота не верна"s); }
@@ -17,18 +15,16 @@ using namespace std;
 		//cout << string(name) << stopname_to_stop_.size() << endl;
 	}
 
-	 const TransportCatalogue::Stop* TransportCatalogue::FindStop(string_view name) const{
+	const TransportCatalogue::Stop* TransportCatalogue::FindStop(string_view name) const{
 		 return (stopname_to_stop_.find(name) != stopname_to_stop_.end()) ? stopname_to_stop_.at(name) : nullptr;
 	}
 
-	 void TransportCatalogue::AddBus(string_view number, vector<string_view> stops, bool ring) {
+	void TransportCatalogue::AddBus(string_view number, const vector<string_view>& stops, bool ring) {
 		 vector<Stop*> tmp;
 		 for (auto& stop : stops) {
-		 //	if (stopname_to_stop_.find(stop) == stopname_to_stop_.end()) { throw out_of_range("остановка для маршрута не заданна"); }
 			 auto stop_tmp = stopname_to_stop_.at(stop);
 			 tmp.push_back(stop_tmp);
 		 }
-
 		 Bus tp = { move(string{number}), tmp, ring };
 		 Bus& bus = buses_.emplace_back(move(tp));
 		 busname_to_bus_[bus.bus_number] = &bus;
@@ -46,10 +42,10 @@ using namespace std;
 
 
 	int TransportCatalogue::FindDistance(string_view name, string_view name2, bool ring) {
-		
 		  TransportCatalogue::Stop* st = stopname_to_stop_.at(name);
 		  TransportCatalogue::Stop* st2 = stopname_to_stop_.at(name2);
 		  int tmp1 = distance_stops_.count({ st,st2 }) ? distance_stops_.at({ st, st2 }) : distance_stops_.at({ st2, st });
+
 		  if (ring == true) {
 			  return tmp1;
 		  }
@@ -61,7 +57,9 @@ using namespace std;
 	optional<set<string_view>> TransportCatalogue::GetStopInfo(string_view stop) const{
 		const auto& tmp = FindStop(stop);
 		if (tmp == nullptr) { return nullopt; }
+
 		set<string_view> buses;
+
 		for (const auto& bus : busname_to_bus_) {
 			auto tp = find(bus.second->bus_stops.begin(), bus.second->bus_stops.end(), tmp);
 			if (tp != bus.second->bus_stops.end()) { buses.insert(bus.second->bus_number); }
@@ -80,6 +78,7 @@ using namespace std;
 		for (auto& stop : bus->bus_stops) {
 			stops.insert(stop->stop_name); 
 		}
+
 		result.unique_stops = stops.size();
 
 		for (auto stop1 = bus->bus_stops.begin(), stop2 = stop1 + 1;

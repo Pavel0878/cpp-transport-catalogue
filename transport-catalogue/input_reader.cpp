@@ -16,7 +16,7 @@ string_view Unquote(string_view value) {
     return value;
 }
 
-void ParsingStop( TransportCatalogue& tc, string_view stop) {
+void ParseStop( TransportCatalogue& tc, string_view stop) {
 
     size_t pos = stop.find(' ');
     stop.remove_prefix(pos);
@@ -43,19 +43,16 @@ void ParsingStop( TransportCatalogue& tc, string_view stop) {
             string na = string(name);
             stop_distance[{na, st}] = dis;
         }
-        
-
     }
     else {
         lon = string(stop.substr(0));
     }
     tc.AddStop(name, stod( lat), stod(lon));
-
    // cout <<"Stop :" << string(name) << ';' << lat << ';' << lon << endl;
     //cout << stop << ',' << Unquote(name) << ';' << lon << ';' << lat << endl;
 }
 
-pair<string,vector<string>> ParsingBus(string_view bus, char by) {
+pair<string,vector<string>> ParseBus(string_view bus, char by) {
     vector<string> stops;
     string name;
     size_t pos = bus.find(' ');
@@ -77,12 +74,12 @@ pair<string,vector<string>> ParsingBus(string_view bus, char by) {
 }
 
 
-void Load(TransportCatalogue& tc) {
+void Load(TransportCatalogue& tc, istream& is) {
     map<string, vector<string>> bus;
     map<string, vector<string>> bus_ring;
     int num;
     string s;
-    cin >> num;
+    is >> num;
     int i = 0;
     getline(cin, s);
     while (i < num) {
@@ -90,16 +87,15 @@ void Load(TransportCatalogue& tc) {
         getline(cin, s);
         size_t pos = s.find(' ');
         string com = s.substr(0, pos);
-        if (com == "Stop"s) {ParsingStop(tc, s); }
+        if (com == "Stop"s) {ParseStop(tc, s); }
         
         if (com == "Bus"s) {
-            
             if (s.find('-') < s.size()) {
-                bus.insert(move( ParsingBus( s, '-')));
+                bus.insert(move( ParseBus( s, '-')));
                  //cout <<'-' << string(s) << endl;
             }
             if (s.find('>') < s.size()) {
-                bus_ring.insert(move( ParsingBus( s, '>')));
+                bus_ring.insert(move( ParseBus( s, '>')));
                 // cout <<'>' << string(s) << endl;
             }
              //cout << string(bus) << endl;
@@ -126,7 +122,6 @@ void Load(TransportCatalogue& tc) {
        // cout << number << endl;
       //  cout << stops2.size() << endl;
         tc.AddBus(number, stops2, true);
-        
     }
 
     for (auto [stop, dis] : stop_distance) {

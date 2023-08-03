@@ -6,13 +6,10 @@
 
 using namespace std;
 
-
-
-
 int main() {
 	TransportCatalogue tr;
 
-		Load(tr);
-		LoadInfo(tr);
+		Load(tr, cin);
+		LoadInfo(tr, cin, cout);
 	//StatBusInfo(tr);
 }

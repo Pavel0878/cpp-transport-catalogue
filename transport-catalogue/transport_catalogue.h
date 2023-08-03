@@ -19,7 +19,6 @@
 		struct Stop {
 			std::string stop_name;
 			Coordinates coordinates;
-			//std::unordered_map<Stop*, int> stop_distance;
 			//double latitude; //широта
 			//double longitude; //долгота
 		};
@@ -47,7 +46,7 @@
 				size_t st1 = hasher_(stop.first);
 				size_t st2 = hasher_(stop.second);
 				return st1*1000 + st2;
-			}
+			 }
 
 		private:
 			std::hash<const void*> hasher_;
@@ -58,7 +57,7 @@
 
 	    const Stop* FindStop(std::string_view name) const;
 
-		void AddBus(std::string_view number, std::vector<std::string_view> stops, bool ring);
+		void AddBus(std::string_view number, const std::vector<std::string_view>& stops, bool ring);
 
 		const Bus* FindBus(std::string_view number) const;
 
@@ -76,5 +75,4 @@
 		std::unordered_map<std::string_view, Stop*> stopname_to_stop_;
 		std::unordered_map<std::string_view, Bus*> busname_to_bus_;
 		std::unordered_map<std::pair<Stop*, Stop*>, int, StopHash> distance_stops_;
-		//std::unordered_map < std::string_view, std::set<std::string>> stopname_to_bus_;
 	};
