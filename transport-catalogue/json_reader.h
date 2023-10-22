@@ -1,10 +1,5 @@
 #pragma once
 
-/*
- * Здесь можно разместить код наполнения транспортного справочника данными из JSON,
- * а также код обработки запросов к базе и формирование массива ответов в формате JSON
- */
-
 #include "json.h"
 #include "transport_catalogue.h"
 #include "request_handler.h"
@@ -14,19 +9,24 @@
 #include <string_view>
 #include <string>
 #include <vector>
+#include <map>
 
-/*
 class JsonReader {
 public:
-	//JsonReader(json::Document input)
-	//	:input_(input){}
-	JsonReader() = default;
 
-	void Read(TransportCatalogue& tc, std::istream& is, std::ostream& out);
+	void Read(std::istream& is, std::ostream& out);
+	void SetBase(const json::Array& arr);
+	void SetStop(const json::Dict& dict);
+	void SetDistance(const json::Dict& dict);
+	void SetBus(const json::Dict& dict);
+	void SetMap(const json::Dict& dict, std::ostream& out);
 
+	json::Array GetInfo(const json::Array& arr);
+	json::Dict GetStop(const json::Dict& dict);
+	json::Dict GetBus(const json::Dict& dict);
+	json::Dict GetMap(const json::Dict& dict);
+	
 private:
-	//json::Document input_;
+	TransportCatalogue::TransportCatalogue tc_;
+	std::ostringstream out_svg_;
 };
-*/
-
-void Read(std::istream& is = std::cin, std::ostream& out = std::cout);

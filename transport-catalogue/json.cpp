@@ -23,11 +23,7 @@ namespace json {
             return Node(move(result));
         }
 
-        //using Number = std::variant<int, double>;
-
-        //Number
         Node LoadNumber(istream& input) {
-            //using namespace literals;
 
             string parsed_num;
 
@@ -101,7 +97,6 @@ namespace json {
         // Функцию следует использовать после считывания открывающего символа ":
         //std::string
         Node LoadString(istream& input) {
-            // using namespace literals;
 
             auto it = istreambuf_iterator<char>(input);
             auto end = istreambuf_iterator<char>();
@@ -379,7 +374,6 @@ namespace json {
         }
     };
 
-
     void PrintNode(const Node& node, const PrintContext& ctx);
 
     // Шаблон, подходящий для вывода double и int
@@ -411,7 +405,6 @@ namespace json {
     }
 
     void PrintValue(const Array& array, const PrintContext& ctx) {
-        //ctx.PrintIndent();
         ostream& out = ctx.out;
         auto ctx1 = ctx;
         out << "[\n"sv;
@@ -421,10 +414,8 @@ namespace json {
                 first = false;
             }
             else { out << ",\n"sv; }
-            //ctx.PrintIndent();
             PrintNode(node, ctx.Indented());
         }
-        //ctx.PrintIndent();
         out << '\n';
         ctx1.PrintIndent();
         out << ']';
@@ -436,7 +427,6 @@ namespace json {
         out << "{\n"sv;
         bool first = true;
         for (const auto& [key, node] : map) {
-            //ctx.PrintIndent();
             if (first) {
                 first = false;
             }
@@ -444,21 +434,16 @@ namespace json {
             ctx.PrintIndent();
             ctx.PrintIndent();
             out << "\""sv;
-           // ctx.PrintIndent();
             out << key;
             out << "\": "sv;
-            //ctx.PrintIndent();
             PrintNode(node, ctx.Indented());
-           // out << '\n';
         }
-       // ctx.PrintIndent();
         out << '\n';
         ctx.PrintIndent();
         out <<'}';
     }
 
     void PrintValue(const bool& value, const PrintContext& ctx) {
-        //ostream& out
         ctx.out << (value ? "true"sv : "false"sv);
     }
 
@@ -469,10 +454,7 @@ namespace json {
     }
 
     void Print(const Document& doc, std::ostream& output) {
-        // (void) &doc;
-        // (void) &output;
         PrintNode(doc.GetRoot(), PrintContext{ output });
-        // Реализуйте функцию самостоятельно
     }
 
 }  // namespace json

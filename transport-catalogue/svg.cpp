@@ -123,7 +123,6 @@ namespace svg {
                 out << str;
             }
         }
-        // out<< data_;
 
         out << "</text>"sv;
     }

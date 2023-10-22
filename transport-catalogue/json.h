@@ -8,7 +8,6 @@
 #include <cassert>
 #include <sstream>
 
-
 namespace json {
 
     class Node;
