@@ -30,7 +30,7 @@ namespace TransportCatalogue {
 
 		const std::deque<Stop>& GetStops() const;
 		std::set<std::string_view> GetAllBus();
-		
+
 
 	private:
 		std::deque<Stop> stops_;

@@ -12,15 +12,15 @@
 #include <unordered_map>
 
 namespace renderer {
-    inline const double EPSILON = 1e-6;
-    bool IsZero(double value);
+	inline const double EPSILON = 1e-6;
+	bool IsZero(double value);
 
-    class SphereProjector {
-    public:
-        // points_begin и points_end задают начало и конец интервала элементов geo::Coordinates
-        template <typename PointInputIt>
-        SphereProjector(PointInputIt points_begin, PointInputIt points_end,
-            double max_width, double max_height, double padding);
+	class SphereProjector {
+	public:
+		// points_begin и points_end задают начало и конец интервала элементов geo::Coordinates
+		template <typename PointInputIt>
+		SphereProjector(PointInputIt points_begin, PointInputIt points_end,
+			double max_width, double max_height, double padding);
 
 		// Проецирует широту и долготу в координаты внутри SVG-изображения
 		svg::Point operator()(geo::Coordinates coords) const {
@@ -30,12 +30,12 @@ namespace renderer {
 			};
 		}
 
-    private:
-        double padding_;
-        double min_lon_ = 0;
-        double max_lat_ = 0;
-        double zoom_coeff_ = 0;
-    };
+	private:
+		double padding_;
+		double min_lon_ = 0;
+		double max_lat_ = 0;
+		double zoom_coeff_ = 0;
+	};
 
 	struct Map {
 		double width = 0.0;
@@ -55,17 +55,17 @@ namespace renderer {
 	class MapRenderer {
 	public:
 		MapRenderer(Map& map)
-			:map_(map){}
+			:map_(map) {}
 
 		const SphereProjector& FillProjector(std::vector<geo::Coordinates> geo_coords);
 
 		void SetRoute(const std::vector<TransportCatalogue::Bus>& all_buses
 			, const std::deque<TransportCatalogue::Stop>& all_stops);
-		
+
 		void SetPolylineRout(std::vector<svg::Point> coordinates_stops, bool bus_ring);
 		void SetNameRoute(svg::Point bus, std::string bus_name);
 		void SetCircleStop(svg::Point stop);
-		void SetNameStop(svg::Point stop,std::string stop_name);
+		void SetNameStop(svg::Point stop, std::string stop_name);
 
 		void GetDocument(std::ostream& out);
 

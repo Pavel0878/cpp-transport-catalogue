@@ -7,15 +7,15 @@ namespace geo {
 
     static const double RADIUS_EARTH = 6371000;
 
-double ComputeDistance(Coordinates from, Coordinates to) {
-    using namespace std;
-    if (from == to) {
-        return 0;
+    double ComputeDistance(Coordinates from, Coordinates to) {
+        using namespace std;
+        if (from == to) {
+            return 0;
+        }
+        static const double dr = M_PI / 180.;
+        return acos(sin(from.lat * dr) * sin(to.lat * dr)
+            + cos(from.lat * dr) * cos(to.lat * dr) * cos(abs(from.lng - to.lng) * dr))
+            * RADIUS_EARTH;
     }
-    static const double dr = M_PI / 180.;
-    return acos(sin(from.lat * dr) * sin(to.lat * dr)
-                + cos(from.lat * dr) * cos(to.lat * dr) * cos(abs(from.lng - to.lng) * dr))
-        * RADIUS_EARTH;
-}
 
 }  // namespace geo

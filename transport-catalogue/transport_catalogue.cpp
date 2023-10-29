@@ -40,7 +40,7 @@ namespace TransportCatalogue {
 		return (busname_to_bus_.find(number) != busname_to_bus_.end()) ? busname_to_bus_.at(number) : nullptr;
 	}
 
-	int TransportCatalogue::FindDistance(string_view name, string_view name2, bool ring) const{
+	int TransportCatalogue::FindDistance(string_view name, string_view name2, bool ring) const {
 		Stop* st = stopname_to_stop_.at(name);
 		Stop* st2 = stopname_to_stop_.at(name2);
 		int tmp1 = distance_stops_.count({ st,st2 }) ? distance_stops_.at({ st, st2 }) : distance_stops_.at({ st2, st });
@@ -65,7 +65,7 @@ namespace TransportCatalogue {
 		return buses;
 	}
 
-	BusInfo TransportCatalogue::GetBusInfo(string_view number) const{
+	BusInfo TransportCatalogue::GetBusInfo(string_view number) const {
 		const auto bus = FindBus(number);
 		BusInfo result;
 		result.number_bus = number;
@@ -99,7 +99,7 @@ namespace TransportCatalogue {
 		}
 		return name_bus;
 	}
-	
+
 	const deque<Stop>& TransportCatalogue::GetStops() const {
 		return stops_;
 	}

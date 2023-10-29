@@ -11,38 +11,38 @@
  * можете оставить его пустым.
  */
 
-// Класс RequestHandler играет роль Фасада, упрощающего взаимодействие JSON reader-а
-// с другими подсистемами приложения.
-// См. паттерн проектирования Фасад: https://ru.wikipedia.org/wiki/Фасад_(шаблон_проектирования)
+ // Класс RequestHandler играет роль Фасада, упрощающего взаимодействие JSON reader-а
+ // с другими подсистемами приложения.
+ // См. паттерн проектирования Фасад: https://ru.wikipedia.org/wiki/Фасад_(шаблон_проектирования)
 
 
-/*
-#include "transport_catalogue.h"
+ /*
+ #include "transport_catalogue.h"
 
-#include <string_view>
-#include <optional>
-#include <unordered_set>
+ #include <string_view>
+ #include <optional>
+ #include <unordered_set>
 
 
-namespace TransportCatalogue {
-    class RequestHandler {
-    public:
-        // MapRenderer понадобится в следующей части итогового проекта
-        RequestHandler(const TransportCatalogue& db , const renderer::MapRenderer& renderer);
+ namespace TransportCatalogue {
+     class RequestHandler {
+     public:
+         // MapRenderer понадобится в следующей части итогового проекта
+         RequestHandler(const TransportCatalogue& db , const renderer::MapRenderer& renderer);
 
-        // Возвращает информацию о маршруте (запрос Bus)
-        std::optional<BusInfo> GetBusStat(const std::string_view& bus_name) const;
+         // Возвращает информацию о маршруте (запрос Bus)
+         std::optional<BusInfo> GetBusStat(const std::string_view& bus_name) const;
 
-        // Возвращает маршруты, проходящие через
-        const std::unordered_set<Bus*>* GetBusesByStop(const std::string_view& stop_name) const;
+         // Возвращает маршруты, проходящие через
+         const std::unordered_set<Bus*>* GetBusesByStop(const std::string_view& stop_name) const;
 
-        // Этот метод будет нужен в следующей части итогового проекта
-        svg::Document RenderMap() const;
+         // Этот метод будет нужен в следующей части итогового проекта
+         svg::Document RenderMap() const;
 
-    private:
-        // RequestHandler использует агрегацию объектов "Транспортный Справочник" и "Визуализатор Карты"
-        const TransportCatalogue& db_;
-        const renderer::MapRenderer& renderer_;
-    };
-}  //namespace TransportCatalogue
-*/
+     private:
+         // RequestHandler использует агрегацию объектов "Транспортный Справочник" и "Визуализатор Карты"
+         const TransportCatalogue& db_;
+         const renderer::MapRenderer& renderer_;
+     };
+ }  //namespace TransportCatalogue
+ */

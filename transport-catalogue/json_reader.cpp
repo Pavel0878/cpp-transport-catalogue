@@ -2,51 +2,58 @@
 
 using namespace std;
 
-    svg::Color ConvertColor(const json::Node colors) {
-        if (colors.IsArray()) {
-            auto color = colors.AsArray();
-            if (color.size() == 3) {
-                uint8_t r = static_cast<uint8_t>(color[0].AsDouble());
-                uint8_t g = static_cast<uint8_t>(color[1].AsDouble());
-                uint8_t b = static_cast<uint8_t>(color[2].AsDouble());
-                return svg::Rgb{ r, g, b };
-            }
-            else {
-                uint8_t r = static_cast<uint8_t>(color[0].AsDouble());
-                uint8_t g = static_cast<uint8_t>(color[1].AsDouble());
-                uint8_t b = static_cast<uint8_t>(color[2].AsDouble());
-                double opacity = color[3].AsDouble();
-                return svg::Rgba{ r, g, b, opacity };
-            }
+svg::Color ConvertColor(const json::Node colors) {
+    if (colors.IsArray()) {
+        auto color = colors.AsArray();
+        if (color.size() == 3) {
+            uint8_t r = static_cast<uint8_t>(color[0].AsDouble());
+            uint8_t g = static_cast<uint8_t>(color[1].AsDouble());
+            uint8_t b = static_cast<uint8_t>(color[2].AsDouble());
+            return svg::Rgb{ r, g, b };
         }
-        return colors.AsString();
+        else {
+            uint8_t r = static_cast<uint8_t>(color[0].AsDouble());
+            uint8_t g = static_cast<uint8_t>(color[1].AsDouble());
+            uint8_t b = static_cast<uint8_t>(color[2].AsDouble());
+            double opacity = color[3].AsDouble();
+            return svg::Rgba{ r, g, b, opacity };
+        }
     }
+    return colors.AsString();
+}
 
 void JsonReader::Read(istream& is, ostream& out) {
     const json::Document document = json::Load(is);
-    const json::Dict dict = document.GetRoot().AsMap();
+    const json::Dict dict = document.GetRoot().AsDict();
     if (dict.count("base_requests"s)) {
         SetBase(dict.at("base_requests"s).AsArray());
     }
     if (dict.count("render_settings"s)) {
-        SetMap(dict.at("render_settings"s).AsMap(), out_svg_);
+        SetMap(dict.at("render_settings"s).AsDict(), map_out_);
     }
     if (dict.count("stat_requests"s)) {
-        auto tp = dict.at("stat_requests"s).AsArray();
-        json::Print(json::Document(GetInfo(dict.at("stat_requests"s).AsArray())), out);
-           }
+        json::Array arr_out = GetInfo(dict.at("stat_requests"s).AsArray());
+        json::Print(
+            json::Document{
+            json::Builder{}
+            .Value(arr_out)
+                .Build()
+        }, out);
+       // auto tp = dict.at("stat_requests"s).AsArray();
+      //  json::Print(json::Document(GetInfo(dict.at("stat_requests"s).AsArray())), out);
+    }
 }
 
 void JsonReader::SetBase(const json::Array& arr) {
     for (const auto node : arr) {
-        auto dict = node.AsMap();
+        auto dict = node.AsDict();
         if (dict.at("type"s).AsString() == "Stop"s) {
             SetStop(dict);
         }
     }
 
     for (const auto node : arr) {
-        json::Dict dict = node.AsMap();
+        json::Dict dict = node.AsDict();
         string type = dict.at("type"s).AsString();
         if (type == "Stop"s) {
             SetDistance(dict);
@@ -66,7 +73,7 @@ void JsonReader::SetStop(const json::Dict& dict) {
 
 void JsonReader::SetDistance(const json::Dict& dict) {
     string Stop1 = dict.at("name"s).AsString();
-    json::Dict str = dict.at("road_distances"s).AsMap();
+    json::Dict str = dict.at("road_distances"s).AsDict();
     for (auto [Stop2, node] : str) {
         tc_.AddDistanceStop(Stop1, Stop2, node.AsInt());
     }
@@ -110,13 +117,13 @@ void JsonReader::SetMap(const json::Dict& dict, ostream& out) {
         bus_all.emplace_back(*tc_.FindBus(bus));
     }
     mr_.SetRoute(bus_all, tc_.GetStops());
-        mr_.GetDocument(out);
+    mr_.GetDocument(out);
 }
 
 json::Array JsonReader::GetInfo(const json::Array& arr) {
     json::Array result;
     for (const auto node : arr) {
-        auto dict = node.AsMap();
+        auto dict = node.AsDict();
         if (dict.at("type"s).AsString() == "Stop"s) {
             result.emplace_back(GetStop(dict));
         }
@@ -158,18 +165,27 @@ json::Dict JsonReader::GetBus(const json::Dict& dict) {
         result.emplace("error_message"s, json::Node("not found"s));
     }
     else {
-            result.emplace("curvature"s, json::Node(bus_info.real_number));
-            result.emplace("route_length"s, json::Node(bus_info.actual_length));
-            result.emplace("stop_count"s, json::Node(static_cast<int>(bus_info.stops_on_route)));
-            result.emplace("unique_stop_count"s, json::Node(static_cast<int>(bus_info.unique_stops)));
+        result.emplace("curvature"s, json::Node(bus_info.real_number));
+        result.emplace("route_length"s, json::Node(bus_info.actual_length));
+        result.emplace("stop_count"s, json::Node(static_cast<int>(bus_info.stops_on_route)));
+        result.emplace("unique_stop_count"s, json::Node(static_cast<int>(bus_info.unique_stops)));
     }
     return result;
 }
 
 json::Dict JsonReader::GetMap(const json::Dict& dict) {
-    json::Dict result;
-    json::Node doc_svg(out_svg_.str());
-    result.emplace("request_id"s, dict.at("id"s).AsInt());
-    result.emplace("map"s, doc_svg);
-    return result;
+    int id = dict.at("id"s).AsInt();
+    return json::Builder{}
+    .StartDict()
+        .Key("request_id"s).Value(id)
+        .Key("map"s).Value(map_out_.str())
+        .EndDict()
+        .Build()
+        .AsDict();
+
+   // json::Dict result;
+   // json::Node doc_svg(out_svg_.str());
+   // result.emplace("request_id"s, dict.at("id"s).AsInt());
+  //  result.emplace("map"s, doc_svg);
+  //  return result;
 }

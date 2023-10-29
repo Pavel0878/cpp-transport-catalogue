@@ -4,12 +4,14 @@
 #include "transport_catalogue.h"
 #include "request_handler.h"
 #include "map_renderer.h"
+#include "json_builder.h"
 
 #include <iostream>
 #include <string_view>
 #include <string>
 #include <vector>
 #include <map>
+#include <sstream>
 
 class JsonReader {
 public:
@@ -25,8 +27,10 @@ public:
 	json::Dict GetStop(const json::Dict& dict);
 	json::Dict GetBus(const json::Dict& dict);
 	json::Dict GetMap(const json::Dict& dict);
-	
+
 private:
 	TransportCatalogue::TransportCatalogue tc_;
-	std::ostringstream out_svg_;
+	//json::Array arr_out_;
+	std::stringstream map_out_;
+	//std::ostringstream out_svg_;
 };

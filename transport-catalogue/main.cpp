@@ -6,5 +6,5 @@ using namespace std;
 
 int main() {
     JsonReader reader;
-   reader.Read(cin, cout);
+    reader.Read(cin, cout);
 }
