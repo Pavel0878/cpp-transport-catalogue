@@ -92,7 +92,7 @@ namespace TransportCatalogue {
 		return result;
 	}
 
-	set<string_view> TransportCatalogue::GetAllBus() {
+	const set<string_view> TransportCatalogue::GetAllBus() const {
 		set<string_view> name_bus;
 		for (auto [name, bus] : busname_to_bus_) {
 			name_bus.insert(name);

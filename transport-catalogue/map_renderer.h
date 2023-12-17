@@ -57,15 +57,13 @@ namespace renderer {
 		MapRenderer(Map& map)
 			:map_(map) {}
 
-		const SphereProjector& FillProjector(std::vector<geo::Coordinates> geo_coords);
-
 		void SetRoute(const std::vector<TransportCatalogue::Bus>& all_buses
 			, const std::deque<TransportCatalogue::Stop>& all_stops);
 
-		void SetPolylineRout(std::vector<svg::Point> coordinates_stops, bool bus_ring);
-		void SetNameRoute(svg::Point bus, std::string bus_name);
+		void SetPolylineRout(const std::vector<svg::Point>& coordinates_stops, bool bus_ring);
+		void SetNameRoute(svg::Point bus, const std::string& bus_name);
 		void SetCircleStop(svg::Point stop);
-		void SetNameStop(svg::Point stop, std::string stop_name);
+		void SetNameStop(svg::Point stop, const std::string& stop_name);
 
 		void GetDocument(std::ostream& out);
 

@@ -82,9 +82,9 @@ namespace json {
 		nodes_stack_.pop_back();
 		return BaseContext(*this);
 	}
-	
+
 	BaseContext::BaseContext(Builder& builder)
-		: builder_(builder){}
+		: builder_(builder) {}
 
 	Node BaseContext::Build() {
 		return builder_.Build();
@@ -110,27 +110,19 @@ namespace json {
 	}
 
 	KeyItemContext::KeyItemContext(BaseContext base)
-		: BaseContext(base){}
+		: BaseContext(base) {}
 
 	DictItemContext KeyItemContext::Value(Node value) {
 		return BaseContext::Value(std::move(value));
 	}
 
-//	ValueItemContext::ValueItemContext(BaseContext base)
-//		: BaseContext(base){}
-
-//	ValueItemContext ValueItemContext::Value(Node value) {
-//		return BaseContext::Value(std::move(value));
-//	}
-
 	DictItemContext::DictItemContext(BaseContext base)
-		: BaseContext(base){}
+		: BaseContext(base) {}
 
 	ArrayItemContext::ArrayItemContext(BaseContext base)
-		: BaseContext(base){}
+		: BaseContext(base) {}
 
 	ArrayItemContext ArrayItemContext::Value(Node value) {
 		return BaseContext::Value(std::move(value));
 	}
-	
 }

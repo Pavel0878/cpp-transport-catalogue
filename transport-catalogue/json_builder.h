@@ -15,25 +15,24 @@ namespace json {
 
 	class Builder {
 	public:
-	      Builder();
-		  KeyItemContext Key(std::string key);
-		  BaseContext Value(Node value);
-		  DictItemContext StartDict();
-		  ArrayItemContext StartArray();
-		  BaseContext EndDict();
-		  BaseContext EndArray();
+		Builder();
+		KeyItemContext Key(std::string key);
+		BaseContext Value(Node value);
+		DictItemContext StartDict();
+		ArrayItemContext StartArray();
+		BaseContext EndDict();
+		BaseContext EndArray();
 		Node Build();
 
 	private:
 		Node root_;
 		std::vector<Node*> nodes_stack_;
-		
-		//Node& Node::GetValue();
 	};
-	
+
 	class BaseContext {
 	public:
 		BaseContext(Builder& builder);
+
 		Node Build();
 		KeyItemContext Key(std::string key);
 		BaseContext Value(Node value);
@@ -52,27 +51,14 @@ namespace json {
 		Node Build() = delete;
 		KeyItemContext Key(std::string key) = delete;
 		DictItemContext Value(Node value);
-	////	DictItemContext StartDict() = delete;
-	//	ArrayItemContext StartArray() = delete;
 		BaseContext EndDict() = delete;
 		BaseContext EndArray() = delete;
 	};
-/*
-	class ValueItemContext : public BaseContext {
-	public:
-		ValueItemContext(BaseContext base);
-	//	Node Build() = delete;
-	//	KeyItemContext Key(std::string key) = delete;
-		ValueItemContext Value(Node value) = delete;
-		DictItemContext StartDict() = delete;
-		ArrayItemContext StartArray() = delete;
-	//	BaseContext EndDict() = delete;
-		BaseContext EndArray() = delete;
-	};
-	*/
+
 	class DictItemContext : public BaseContext {
 	public:
 		DictItemContext(BaseContext base);
+
 		Node Build() = delete;
 		BaseContext Value(Node value) = delete;
 		DictItemContext StartDict() = delete;
@@ -83,15 +69,11 @@ namespace json {
 	class ArrayItemContext : public BaseContext {
 	public:
 		ArrayItemContext(BaseContext base);
+
 		Node Build() = delete;
 		KeyItemContext Key(std::string key) = delete;
 		ArrayItemContext Value(Node value);
-	//	ValueItemContext Key(std::string key) = delete;
-	//	ValueItemContext Value(Node value) = delete;
-	//	DictItemContext StartDict() = delete;
-	//	ArrayItemContext StartArray() = delete;
 		BaseContext EndDict() = delete;
-		//BaseContext EndArray() = delete;
 	};
-	
+
 } //namespace json

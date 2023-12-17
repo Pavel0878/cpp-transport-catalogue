@@ -31,16 +31,16 @@ void JsonReader::Read(istream& is, ostream& out) {
     if (dict.count("render_settings"s)) {
         SetMap(dict.at("render_settings"s).AsDict(), map_out_);
     }
+    if (dict.count("routing_settings"s)) {
+        SetRoutingSettings(dict.at("routing_settings"s).AsDict());
+    }
     if (dict.count("stat_requests"s)) {
-        json::Array arr_out = GetInfo(dict.at("stat_requests"s).AsArray());
         json::Print(
             json::Document{
             json::Builder{}
-            .Value(arr_out)
+            .Value(GetInfo(dict.at("stat_requests"s).AsArray()))
                 .Build()
         }, out);
-       // auto tp = dict.at("stat_requests"s).AsArray();
-      //  json::Print(json::Document(GetInfo(dict.at("stat_requests"s).AsArray())), out);
     }
 }
 
@@ -51,7 +51,6 @@ void JsonReader::SetBase(const json::Array& arr) {
             SetStop(dict);
         }
     }
-
     for (const auto node : arr) {
         json::Dict dict = node.AsDict();
         string type = dict.at("type"s).AsString();
@@ -113,64 +112,90 @@ void JsonReader::SetMap(const json::Dict& dict, ostream& out) {
     renderer::MapRenderer mr_(map);
 
     vector<TransportCatalogue::Bus> bus_all;
-    for (auto bus : tc_.GetAllBus()) {
+    for (const auto& bus : tc_.GetAllBus()) {
         bus_all.emplace_back(*tc_.FindBus(bus));
     }
     mr_.SetRoute(bus_all, tc_.GetStops());
     mr_.GetDocument(out);
 }
 
+void JsonReader::SetRoutingSettings(const json::Dict& dict) {
+    TransportRouter::RoutingSettings routing_settings;
+    routing_settings.bus_velocity = dict.at("bus_velocity"s).AsDouble();
+    routing_settings.bus_wait_time = dict.at("bus_wait_time"s).AsDouble();
+    tr_.SetRoutingSettings(tc_, routing_settings);
+}
+
 json::Array JsonReader::GetInfo(const json::Array& arr) {
     json::Array result;
     for (const auto node : arr) {
-        auto dict = node.AsDict();
-        if (dict.at("type"s).AsString() == "Stop"s) {
+        json::Dict dict = node.AsDict();
+        string type = dict.at("type"s).AsString();
+        if (type == "Stop"s) {
             result.emplace_back(GetStop(dict));
         }
-        if (dict.at("type"s).AsString() == "Bus"s) {
+        if (type == "Bus"s) {
             result.emplace_back(GetBus(dict));
         }
-        if (dict.at("type"s).AsString() == "Map"s) {
+        if (type == "Map"s) {
             result.emplace_back(GetMap(dict));
+        }
+        if (type == "Route"s) {
+            result.emplace_back(GetRoute(dict));
         }
     }
     return result;
+}
+
+json::Dict JsonReader::GetError(const int id) {
+    return json::Builder{}
+    .StartDict()
+        .Key("request_id"s).Value(id)
+        .Key("error_message"s).Value("not found"s)
+        .EndDict()
+        .Build()
+        .AsDict();
 }
 
 json::Dict JsonReader::GetStop(const json::Dict& dict) {
-    json::Dict result;
-    json::Array arr;
     auto str = tc_.GetStopInfo(dict.at("name"s).AsString());
-    if (dict.count("id"s)) {
-        result.emplace("request_id"s, dict.at("id"s).AsInt());
-    }
+    int id = dict.at("id"s).AsInt();
     if (str == nullopt) {
-        result.emplace("error_message"s, json::Node("not found"s));
+        return GetError(id);
     }
     else {
+        json::Array arr;
         for (auto& st : *str) {
             arr.push_back(string(st));
         }
-        result.emplace("buses", arr);
+        return json::Builder{}
+        .StartDict()
+            .Key("request_id"s).Value(id)
+            .Key("buses").Value(arr)
+            .EndDict()
+            .Build()
+            .AsDict();
     }
-
-    return result;
 }
 
 json::Dict JsonReader::GetBus(const json::Dict& dict) {
-    json::Dict result;
     auto bus_info = tc_.GetBusInfo(dict.at("name"s).AsString());
-    result.emplace("request_id"s, dict.at("id"s).AsInt());
+    int id = dict.at("id"s).AsInt();
     if (bus_info.unique_stops == 0) {
-        result.emplace("error_message"s, json::Node("not found"s));
+        return GetError(id);
     }
     else {
-        result.emplace("curvature"s, json::Node(bus_info.real_number));
-        result.emplace("route_length"s, json::Node(bus_info.actual_length));
-        result.emplace("stop_count"s, json::Node(static_cast<int>(bus_info.stops_on_route)));
-        result.emplace("unique_stop_count"s, json::Node(static_cast<int>(bus_info.unique_stops)));
+        return json::Builder{}
+        .StartDict()
+            .Key("request_id"s).Value(id)
+            .Key("curvature"s).Value(bus_info.real_number)
+            .Key("route_length"s).Value(bus_info.actual_length)
+            .Key("stop_count"s).Value(static_cast<int>(bus_info.stops_on_route))
+            .Key("unique_stop_count"s).Value(static_cast<int>(bus_info.unique_stops))
+            .EndDict()
+            .Build()
+            .AsDict();
     }
-    return result;
 }
 
 json::Dict JsonReader::GetMap(const json::Dict& dict) {
@@ -182,10 +207,58 @@ json::Dict JsonReader::GetMap(const json::Dict& dict) {
         .EndDict()
         .Build()
         .AsDict();
+}
 
-   // json::Dict result;
-   // json::Node doc_svg(out_svg_.str());
-   // result.emplace("request_id"s, dict.at("id"s).AsInt());
-  //  result.emplace("map"s, doc_svg);
-  //  return result;
+json::Dict JsonReader::GetRoute(const json::Dict& dict) {
+    int id = dict.at("id"s).AsInt();
+    auto& rout = tr_.BuildTransportRouter(
+        dict.at("from"s).AsString(),
+        dict.at("to"s).AsString()
+    ); 
+
+    json::Array items;
+    double total_time = .0;
+    auto& graph = tr_.GetGraph();
+
+    if (rout) {
+
+        for (auto& edge_id : rout.value().edges) {
+
+            auto& edge = graph.GetEdge(edge_id);
+            if (edge.stop_count == 0) {
+                items.emplace_back(json::Node(
+                    json::Builder{}
+                .StartDict()
+                    .Key("stop_name"s).Value(edge.name)
+                    .Key("time"s).Value(edge.weight)
+                    .Key("type"s).Value("Wait"s)
+                    .EndDict()
+                    .Build()));
+
+                total_time += edge.weight;
+            }
+            else {
+                items.emplace_back(json::Node(
+                    json::Builder{}
+                .StartDict()
+                    .Key("bus"s).Value(edge.name)
+                    .Key("span_count"s).Value(static_cast<double>(edge.stop_count))
+                    .Key("time"s).Value(edge.weight)
+                    .Key("type"s).Value("Bus"s)
+                    .EndDict()
+                    .Build()));
+                total_time += edge.weight;
+            }
+        }
+            return json::Builder{}
+            .StartDict()
+                .Key("request_id"s).Value(id)
+                .Key("total_time"s).Value(total_time)
+                .Key("items"s).Value(items)
+                .EndDict()
+                .Build()
+                .AsDict();
+        
+    }
+    return GetError(id);
 }

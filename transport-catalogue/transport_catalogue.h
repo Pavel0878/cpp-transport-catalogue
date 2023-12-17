@@ -29,8 +29,7 @@ namespace TransportCatalogue {
 		BusInfo  GetBusInfo(std::string_view number) const;
 
 		const std::deque<Stop>& GetStops() const;
-		std::set<std::string_view> GetAllBus();
-
+		const std::set<std::string_view> GetAllBus() const;
 
 	private:
 		std::deque<Stop> stops_;

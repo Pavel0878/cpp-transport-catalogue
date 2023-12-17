@@ -5,6 +5,7 @@
 #include "request_handler.h"
 #include "map_renderer.h"
 #include "json_builder.h"
+#include "transport_router.h"
 
 #include <iostream>
 #include <string_view>
@@ -22,15 +23,17 @@ public:
 	void SetDistance(const json::Dict& dict);
 	void SetBus(const json::Dict& dict);
 	void SetMap(const json::Dict& dict, std::ostream& out);
+	void SetRoutingSettings(const json::Dict& dict);
 
+	json::Dict GetError(const int id);
 	json::Array GetInfo(const json::Array& arr);
 	json::Dict GetStop(const json::Dict& dict);
 	json::Dict GetBus(const json::Dict& dict);
 	json::Dict GetMap(const json::Dict& dict);
+	json::Dict GetRoute(const json::Dict& dict);
 
 private:
 	TransportCatalogue::TransportCatalogue tc_;
-	//json::Array arr_out_;
 	std::stringstream map_out_;
-	//std::ostringstream out_svg_;
+	TransportRouter::TransportRouter tr_;
 };

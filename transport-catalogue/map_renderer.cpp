@@ -100,7 +100,6 @@ namespace renderer {
             if (number_color_ == map_.color_palette.size()) { number_color_ = 0; }
         }
 
-
         for (const auto stop : stop_all_bus) {
             for (auto st : all_stops) {
                 if (stop == st.stop_name) {
@@ -111,9 +110,7 @@ namespace renderer {
         }
     }
 
-
-
-    void MapRenderer::SetPolylineRout(std::vector<svg::Point> coordinates_stops, bool bus_ring) {
+    void MapRenderer::SetPolylineRout(const std::vector<svg::Point>& coordinates_stops, bool bus_ring) {
         svg::Polyline polyline;
         std::vector <svg::Point> stops_pop;
 
@@ -136,7 +133,7 @@ namespace renderer {
         doc_.Add(polyline);
     }
 
-    void MapRenderer::SetNameRoute(svg::Point bus, std::string bus_name) {
+    void MapRenderer::SetNameRoute(svg::Point bus, const std::string& bus_name) {
         svg::Text background;
         svg::Text name_bus;
         background.SetPosition(bus);
@@ -170,7 +167,7 @@ namespace renderer {
         circle_stop_.push_back(stop_circle);
     }
 
-    void MapRenderer::SetNameStop(svg::Point stop, std::string stop_name) {
+    void MapRenderer::SetNameStop(svg::Point stop, const std::string& stop_name) {
         svg::Text background;
         svg::Text name_stop;
         background.SetPosition(stop);
